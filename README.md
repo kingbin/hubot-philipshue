@@ -28,14 +28,14 @@ This is a hubot plugin that will control your philips hue lights
 
 
 ## Commands:
--   hue lights - list all lights
--   hue light <light number>  - shows light status
--   hue turn light <light number> <on|off> - flips the switch
--   hue groups - groups lights together to control with one API call
--   hue config - reads bridge config
--   hue hash - get a hash code (press the link button)
--   hue set config (name|linkbutton) <value>- change the name or programatically press the link button
--   hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
+-   hubot hue lights - list all lights
+-   hubot hue light <light number>  - shows light status
+-   hubot hue turn light <light number> <on|off> - flips the switch
+-   hubot hue groups - groups lights together to control with one API call
+-   hubot hue config - reads bridge config
+-   hubot hue hash - get a hash code (press the link button)
+-   hubot hue set config (name|linkbutton) <value>- change the name or programatically press the link button
+-   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
 
 ## Notes:
 
