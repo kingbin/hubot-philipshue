@@ -1,7 +1,7 @@
 {
   "name": "hubot-philipshue",
   "description": "Control your Philips Hue Lights from HUBOT! BAM, easy candy for the kids",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Chris Blazek <chris.blazek@gmail.com> (http://chrisblazek.me)",
   "license": "MIT",
   "keywords": [
@@ -33,5 +33,5 @@
   "scripts": {
     "postinstall" : "",
     "test": "script/test"
-  },
+  }
 }
