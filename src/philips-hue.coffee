@@ -48,26 +48,26 @@ module.exports = (robot) ->
 
 
 # GROUP COMMANDS
-  robot.hear /hue groups/i, (msg) ->
+  robot.respond /hue groups/i, (msg) ->
     url = "http://#{base_url}/api/#{hash}/groups"
     getGenInfo msg, url, (responseText) ->
       msg.send "Groups: " + responseText
 
 
 # LIGHT COMMANDS
-  robot.hear /hue lights/i, (msg) ->
+  robot.respond /hue lights/i, (msg) ->
     light = msg.match[1]
     url = "http://#{base_url}/api/#{hash}/lights"
     getGenInfo msg, url, (responseText) ->
       msg.send responseText
 
-  robot.hear /hue light (.*)/i, (msg) ->
+  robot.respond /hue light (.*)/i, (msg) ->
     light = msg.match[1]
     url = "http://#{base_url}/api/#{hash}/lights/#{light}"
     getGenInfo msg, url, (responseText) ->
       msg.send responseText
 
-  robot.hear /hue turn light (.+) (.+)/i, (msg) ->
+  robot.respond /hue turn light (.+) (.+)/i, (msg) ->
     [light, state] = msg.match[1..2]
     msg.send "get off your LAZY ass and turn it " + state + " yourself"
     jsonParams =
@@ -76,7 +76,7 @@ module.exports = (robot) ->
     setInfo msg, url, jsonParams, (responseText) ->
       msg.send responseText
 
-  robot.hear /hue (alert|alerts) light (.+)/i, (msg) ->
+  robot.respond /hue (alert|alerts) light (.+)/i, (msg) ->
     [state,light] = msg.match[1..2]
     msg.send "ain't nobody got time for that!"
 
@@ -88,12 +88,12 @@ module.exports = (robot) ->
 
 
 # BRIDGE COMMANDS
-  robot.hear /hue config/i, (msg) ->
+  robot.respond /hue config/i, (msg) ->
     url = "http://#{base_url}/api/#{hash}/config"
     getGenInfo msg, url, (responseText) ->
       msg.send "Config: " + responseText
 
-  robot.hear /hue hash/i, (msg) ->
+  robot.respond /hue hash/i, (msg) ->
     msg.http("http://#{base_url}/api")
       .headers(Accept: 'application/json')
       .post(JSON.stringify({devicetype: "hubot"})) (err, res, body) ->
@@ -104,7 +104,7 @@ module.exports = (robot) ->
             if (line.success)
               msg.send "Hash:" + line.success.username
 
-  robot.hear /hue set config ([^\s]*) (.*)/i, (msg) ->
+  robot.respond /hue set config ([^\s]*) (.*)/i, (msg) ->
     [setting,val] = msg.match[1..2]
     supportedSettings = ['name','linkbutton']
     if setting in supportedSettings
