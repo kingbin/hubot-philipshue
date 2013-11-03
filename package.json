@@ -1,15 +1,9 @@
 {
   "name": "hubot-philipshue",
-  "version": "0.0.1",
   "description": "Control your Philips Hue Lights from HUBOT! BAM, easy candy for the kids",
-  "main": "index.coffee",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kingbin/hubot-philipshue"
-  },
+  "version": "0.0.1",
+  "author": "Chris Blazek <chris.blazek@gmail.com> (http://chrisblazek.me)",
+  "license": "MIT",
   "keywords": [
     "hubot",
     "philips-hue",
@@ -17,9 +11,27 @@
     "philips",
     "hue"
   ],
-  "author": "kingbin",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kingbin/hubot-philipshue"
+  },
+  "bugs": {
+    "url": "https://github.com/kingbin/hubot-philipshue/issues"
+  },
   "dependencies": {
-    "hubot": ">= 2.4.0"
-  }
+    "coffee-script": "~1.6"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*",
+    "sinon-chai": "*",
+    "sinon": "*"
+  },
+
+  "main": "index.coffee",
+
+  "scripts": {
+    "postinstall" : "",
+    "test": "script/test"
+  },
 }
