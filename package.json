@@ -1,0 +1,25 @@
+{
+  "name": "hubot-philipshue",
+  "version": "0.0.1",
+  "description": "Control your Philips Hue Lights from HUBOT! BAM, easy candy for the kids",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kingbin/hubot-philipshue"
+  },
+  "keywords": [
+    "hubot",
+    "philips-hue",
+    "philipshue",
+    "philips",
+    "hue"
+  ],
+  "author": "kingbin",
+  "license": "MIT",
+  "dependencies": {
+    "hubot": ">= 2.4.0"
+  }
+}
