@@ -1,6 +1,11 @@
 language: node_js
 node_js:
-  - "0.11"
-  - "0.10"
+- '0.11'
+- '0.10'
 notifications:
   email: false
+deploy:
+  provider: npm
+  email: chris.blazek@gmail.com
+  api_key:
+    secure: gMqW/lvDBPQ3JVtOLSvDZaa1O8Due4VswldEEWClfOYAnfkpveVFHEef9h/fyMId6n2CYOrGpd2gZRcQkhhc4Ied8cetALvB1el2xKl9JOzV4A2TNLUlHs9qE5wDBX5y/XvHwaF772lFV5hQsLCNZqPDg0qrfmDO2lq2sxtDvI4=
