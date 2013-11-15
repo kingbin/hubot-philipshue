@@ -12,7 +12,7 @@ This is a hubot plugin that will control your philips hue lights
 ## Installation
 
 ###The Quick Installation
-Run the following command to make sure the module is installed.
+Run the following command to make sure the module is installed to your local Hubot instance.
 
     $ npm install hubot-philipshue --save
 
