@@ -63,6 +63,17 @@ Example command Line script to set up your hash and hubot philips app
 ## Commands:
 -   hubot hue lights - list all lights
 -   hubot hue light {light number}  - shows light status
+-   hubot hue hsb light {light number} {hue} {saturation} {brightness} 
+    - hue range: 0-6553
+    - saturation range: 0-254
+    - brightness range: 0-254
+-   hubot hue xy light {light number} {x} {y} 
+    - x-y values are in the [CIE Color Space](http://developers.meethue.com/coreconcepts.html#color_gets_more_complicated)
+    - valid x: 0.0-1.0
+    - valid y: 0.0-1.0
+-   hubot hue ct light {light number} {color temp}
+    - color temperature values use [Mired color temperature](http://en.wikipedia.org/wiki/Mired) 
+    - color temperature range: 153-500 (153 appears 6500K, 500 appears 2000K)
 -   hubot hue turn light {light number} {on|off} - flips the switch
 -   hubot hue groups - groups lights together to control with one API call
 -   hubot hue config - reads bridge config
@@ -70,7 +81,11 @@ Example command Line script to set up your hash and hubot philips app
 -   hubot hue set config {name|linkbutton} {value\}- change the name or programatically press the link button
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
 
+
 ## Notes:
 
 ## Author:
    kingbin - chris.blazek@gmail.com
+   
+## Contributor:
+   bschlief - bschlief@gmail.com

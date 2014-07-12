@@ -35,6 +35,15 @@
 #   hubot hue hash - get a hash code (press the link button)
 #   hubot hue set config (name|linkbutton) <value>- change the name or programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
+#   hubot hue hsb light <light number> <hue> <saturation> <brightness>
+#   - hue range: 0-6553
+#   - saturation range: 0-254
+#   - brightness range: 0-254
+#   hubot hue xy light <light number> <x> <y>
+#   - valid x: 0.0-1.0
+#   - valid y: 0.0-1.0
+#   hubot hue ct light <light number> <color temp>
+#   - color temperature range: 153-500 (153 appears 6500K, 500 appears 2000K)
 #
 # Notes:
 #
@@ -53,7 +62,6 @@ module.exports = (robot) ->
     getGenInfo msg, url, (responseText) ->
       msg.send "Groups: " + responseText
 
-
 # LIGHT COMMANDS
   robot.respond /hue lights/i, (msg) ->
     light = msg.match[1]
@@ -65,6 +73,34 @@ module.exports = (robot) ->
     light = msg.match[1]
     url = "http://#{base_url}/api/#{hash}/lights/#{light}"
     getGenInfo msg, url, (responseText) ->
+      msg.send responseText
+
+  robot.respond /hue hsb light (.*) (\d+) (\d+) (\d+)/i, (msg) ->
+    [light,hue,sat,bri] = msg.match[1..4]
+    jsonParams =
+       hue: parseInt(hue)
+       sat: parseInt(sat)
+       bri: parseInt(bri)
+    url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+    setInfo msg, url, jsonParams, (responseText) ->
+      msg.send responseText
+
+  robot.respond /hue xy light (.*) ([0-9]*[.][0-9]+) ([0-9]*[.][0-9]+)/i, (msg) ->
+    [light,x_str,y_str] = msg.match[1..3]
+    x = parseFloat(x_str)
+    y = parseFloat(y_str)
+    jsonParams =
+       xy: [x,y]
+    url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+    setInfo msg, url, jsonParams, (responseText) ->
+      msg.send responseText
+
+  robot.respond /hue ct light (.*) (\d\d\d)/i, (msg) ->
+    [light,color_temp] = msg.match[1..2]
+    jsonParams =
+       ct: parseInt(color_temp)
+    url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+    setInfo msg, url, jsonParams, (responseText) ->
       msg.send responseText
 
   robot.respond /hue turn light (.+) (.+)/i, (msg) ->
