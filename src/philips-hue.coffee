@@ -35,15 +35,9 @@
 #   hubot hue hash - get a hash code (press the link button)
 #   hubot hue set config (name|linkbutton) <value>- change the name or programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
-#   hubot hue hsb light <light number> <hue> <saturation> <brightness>
-#   - hue range: 0-6553
-#   - saturation range: 0-254
-#   - brightness range: 0-254
-#   hubot hue xy light <light number> <x> <y>
-#   - valid x: 0.0-1.0
-#   - valid y: 0.0-1.0
-#   hubot hue ct light <light number> <color temp>
-#   - color temperature range: 153-500 (153 appears 6500K, 500 appears 2000K)
+#   hubot hue hsb light <light number> <hue 0-65535> <saturation 0-254> <brightness 0-254>
+#   hubot hue xy light <light number> <x 0.0-1.0> <y 0.0-1.0>
+#   hubot hue ct light <light number> <color temp 153-500>
 #   hubot hue group <group name>=[<comma separated list of light indexes>]
 #   hubot hue ls groups - lists the groups of lights
 #   hubot hue rm group <group name> - remove grouping of lights named <group name>
