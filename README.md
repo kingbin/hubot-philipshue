@@ -64,7 +64,7 @@ Example command Line script to set up your hash and hubot philips app
 -   hubot hue lights - list all lights
 -   hubot hue light {light number}  - shows light status
 -   hubot hue hsb light {light number} {hue} {saturation} {brightness} 
-    - hue range: 0-6553
+    - hue range: 0-65535
     - saturation range: 0-254
     - brightness range: 0-254
 -   hubot hue xy light {light number} {x} {y} 

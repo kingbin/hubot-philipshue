@@ -36,7 +36,7 @@
 #   hubot hue set config (name|linkbutton) <value>- change the name or programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
 #   hubot hue hsb light <light number> <hue> <saturation> <brightness>
-#   - hue range: 0-6553
+#   - hue range: 0-65535
 #   - saturation range: 0-254
 #   - brightness range: 0-254
 #   hubot hue xy light <light number> <x> <y>
