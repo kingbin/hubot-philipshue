@@ -35,15 +35,17 @@
 #   hubot hue hash - get a hash code (press the link button)
 #   hubot hue set config (name|linkbutton) <value>- change the name or programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
-#   hubot hue hsb light <light number> <hue> <saturation> <brightness>
-#   - hue range: 0-6553
-#   - saturation range: 0-254
-#   - brightness range: 0-254
-#   hubot hue xy light <light number> <x> <y>
-#   - valid x: 0.0-1.0
-#   - valid y: 0.0-1.0
-#   hubot hue ct light <light number> <color temp>
-#   - color temperature range: 153-500 (153 appears 6500K, 500 appears 2000K)
+#   hubot hue hsb light <light number> <hue 0-65535> <saturation 0-254> <brightness 0-254>
+#   hubot hue xy light <light number> <x 0.0-1.0> <y 0.0-1.0>
+#   hubot hue ct light <light number> <color temp 153-500>
+#   hubot hue group <group name>=[<comma separated list of light indexes>]
+#   hubot hue ls groups - lists the groups of lights
+#   hubot hue rm group <group name> - remove grouping of lights named <group name>
+#   hubot hue @<group name> off - turn all lights in <group name> off
+#   hubot hue @<group name> on - turn all lights in <group name> on
+#   hubot hue @<group name> hsb=(<hue>,<sat>,<bri>) - set hsb value for all lights in group
+#   hubot hue @<group name> xy=(<x>,<y>) - set x, y value for all lights in group
+#   hubot hue @<group name> ct=<color temp> - set color temp for all lights in group
 #
 # Notes:
 #
@@ -56,11 +58,31 @@ module.exports = (robot) ->
   hash  = process.env.PHILIPS_HUE_HASH
 
 
+# If you have more than the initial 3 lights, add them to the 'all' array below
+  fake_groups = 
+    1: [1]
+    2: [2]
+    3: [3]
+    all: [1,2,3]
+
 # GROUP COMMANDS
   robot.respond /hue groups/i, (msg) ->
     url = "http://#{base_url}/api/#{hash}/groups"
     getGenInfo msg, url, (responseText) ->
       msg.send "Groups: " + responseText
+
+# FAKE GROUP COMMANDS
+  robot.respond /hue group (\w+)=(\[((\d)+,)*((\d)+)\])/i, (msg) ->
+    msg.send "setting " + msg.match[1] + "=" +msg.match[2]
+    fake_groups[msg.match[1]] = JSON.parse(msg.match[2])
+
+  robot.respond /hue rm group (\w+)/i, (msg) ->
+    msg.send "removing " + msg.match[1]
+    delete fake_groups[msg.match[1]]
+
+  robot.respond /hue ls groups/i, (msg) ->
+    for key of fake_groups
+      msg.send key + " = [" + fake_groups[key] + "]"
 
 # LIGHT COMMANDS
   robot.respond /hue lights/i, (msg) ->
@@ -75,15 +97,37 @@ module.exports = (robot) ->
     getGenInfo msg, url, (responseText) ->
       msg.send responseText
 
+  robot.respond /hue @(\w+) hsb=\((\d+),(\d+),(\d+)\)/i, (msg) ->
+    [group_name,hue,sat,bri] = msg.match[1..4]
+    jsonParams =
+      hue: parseInt(hue)
+      sat: parseInt(sat)
+      bri: parseInt(bri)
+    fake_groups[group_name].forEach (light) ->
+      url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+      setInfo msg, url, jsonParams, (responseText) ->
+        msg.send "okay. set the following lights: " + fake_groups[group_name]
+
   robot.respond /hue hsb light (.*) (\d+) (\d+) (\d+)/i, (msg) ->
     [light,hue,sat,bri] = msg.match[1..4]
     jsonParams =
-       hue: parseInt(hue)
-       sat: parseInt(sat)
-       bri: parseInt(bri)
+      hue: parseInt(hue)
+      sat: parseInt(sat)
+      bri: parseInt(bri)
     url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
     setInfo msg, url, jsonParams, (responseText) ->
       msg.send responseText
+
+  robot.respond /hue @(\w+) xy=\(([0-9]*[.][0-9]+),([0-9]*[.][0-9]+)\)/i, (msg) ->
+    [group_name,x_str,y_str] = msg.match[1..3]
+    x = parseFloat(x_str)
+    y = parseFloat(y_str)
+    jsonParams =
+      xy: [x,y]
+    fake_groups[group_name].forEach (light) ->
+      url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+      setInfo msg, url, jsonParams, (responseText) ->
+        msg.send "okay. set the following lights: " + fake_groups[group_name]
 
   robot.respond /hue xy light (.*) ([0-9]*[.][0-9]+) ([0-9]*[.][0-9]+)/i, (msg) ->
     [light,x_str,y_str] = msg.match[1..3]
@@ -95,6 +139,15 @@ module.exports = (robot) ->
     setInfo msg, url, jsonParams, (responseText) ->
       msg.send responseText
 
+  robot.respond /hue @(\w+) ct=(\d\d\d)/i, (msg) ->
+    [group_name,color_temp] = msg.match[1..2]
+    jsonParams =
+      ct: parseInt(color_temp)
+    fake_groups[group_name].forEach (light) ->
+      url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+      setInfo msg, url, jsonParams, (responseText) ->
+        msg.send "okay. set the following lights: " + fake_groups[group_name]
+        
   robot.respond /hue ct light (.*) (\d\d\d)/i, (msg) ->
     [light,color_temp] = msg.match[1..2]
     jsonParams =
@@ -102,6 +155,15 @@ module.exports = (robot) ->
     url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
     setInfo msg, url, jsonParams, (responseText) ->
       msg.send responseText
+
+  robot.respond /hue @(\w+) (on|off)/i, (msg) ->
+    [group_name, state] = msg.match[1..2]
+    jsonParams =
+      on: if state is "on" then true else false 
+    fake_groups[group_name].forEach (light) ->
+      url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
+      setInfo msg, url, jsonParams, (responseText) ->
+        msg.send "okay. set the following lights: " + fake_groups[group_name]
 
   robot.respond /hue turn light (.+) (.+)/i, (msg) ->
     [light, state] = msg.match[1..2]
@@ -161,7 +223,6 @@ module.exports = (robot) ->
 #    msg.http(endpoint + msg.match[1] + '/users').query(user: msg.match[2]).put() (err, res, body) ->
 #      show(msg, msg.match[1])
 
-
 getGenInfo = (msg, url, callback) ->
     msg.http(url)
       .headers(Accept: 'application/json')
@@ -170,7 +231,6 @@ getGenInfo = (msg, url, callback) ->
            callback JSON.stringify(JSON.parse(body),null,'\t')
          else
            callback res.statusCode
-
 
 setInfo = (msg, url, jsonParams, callback) ->
     msg.http(url)

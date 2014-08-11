@@ -80,7 +80,14 @@ Example command Line script to set up your hash and hubot philips app
 -   hubot hue hash - get a hash code (press the link button)
 -   hubot hue set config {name|linkbutton} {value\}- change the name or programatically press the link button
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
-
+-   hubot hue group {group name}=[{comma separated list of light indexes}]
+-   hubot hue ls groups - lists the groups of lights
+-   hubot hue rm group {group name} - remove grouping of lights named <group name>
+-   hubot hue @{group name} off - turn all lights in <group name> off
+-   hubot hue @{group name} on - turn all lights in <group name> on
+-   hubot hue @{group name} hsb=({hue},{sat},{bri}) - set hsb value for all lights in group
+-   hubot hue @{group name} xy=({x},{y}) - set x, y value for all lights in group
+-   hubot hue @{group name} ct={color temp} - set color temp for all lights in group
 
 ## Notes:
 
