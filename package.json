@@ -1,7 +1,7 @@
 {
   "name": "hubot-philipshue",
   "description": "Control your Philips Hue Lights from HUBOT! BAM, easy candy for the kids",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Chris Blazek <chris.blazek@gmail.com> (http://chrisblazek.me)",
   "license": "MIT",
   "keywords": [
@@ -22,10 +22,10 @@
     "coffee-script": "~1.6"
   },
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*",
-    "sinon-chai": "*",
-    "sinon": "*"
+    "mocha": "~1.14.0",
+    "chai": "~1.8.1",
+    "sinon-chai": "~2.4.0",
+    "sinon": "~1.7.3"
   },
   "main": "index.coffee",
   "scripts": {

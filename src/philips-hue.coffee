@@ -59,7 +59,7 @@ module.exports = (robot) ->
 
 
 # If you have more than the initial 3 lights, add them to the 'all' array below
-  fake_groups = 
+  fake_groups =
     1: [1]
     2: [2]
     3: [3]
@@ -147,7 +147,7 @@ module.exports = (robot) ->
       url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
       setInfo msg, url, jsonParams, (responseText) ->
         msg.send "okay. set the following lights: " + fake_groups[group_name]
-        
+
   robot.respond /hue ct light (.*) (\d\d\d)/i, (msg) ->
     [light,color_temp] = msg.match[1..2]
     jsonParams =
@@ -159,7 +159,7 @@ module.exports = (robot) ->
   robot.respond /hue @(\w+) (on|off)/i, (msg) ->
     [group_name, state] = msg.match[1..2]
     jsonParams =
-      on: if state is "on" then true else false 
+      on: if state is "on" then true else false
     fake_groups[group_name].forEach (light) ->
       url = "http://#{base_url}/api/#{hash}/lights/#{light}/state"
       setInfo msg, url, jsonParams, (responseText) ->
