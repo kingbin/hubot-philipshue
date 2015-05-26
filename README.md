@@ -98,7 +98,7 @@ $ curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d
 -   hubot hue groups - groups lights together to control with one API call
 -   hubot hue config - reads bridge config
 -   hubot hue hash - get a hash code (press the link button)
--   hubot hue inkbutton - programatically press the link button
+-   hubot hue linkbutton - programatically press the link button
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
 -   hubot hue group {group name}=[{comma separated list of light indexes}]
 -   hubot hue ls groups - lists the groups of lights
