@@ -29,7 +29,7 @@ $ npm install hubot-philipshue
 
 Add the package `hubot-philipshue` as a dependency in your Hubot `package.json` file.
 
-```
+```json
     "dependencies": {
       "hubot-philipshue": "*"
     }
@@ -38,14 +38,14 @@ Add the package `hubot-philipshue` as a dependency in your Hubot `package.json` 
 ###And then turn the Hubot script on
 To enable the script, add the `hubot-philipshue` entry to the `external-scripts.json` file (you may need to create this file).
 
-```
+```json
 ["hubot-philipshue"]
 ```
 
 ## Configuration:
 ####Environment variables:
 
-```
+```bash
 export PHILIPS_HUE_HASH="secrets"
 export PHILIPS_HUE_IP="xxx.xxx.xxx.xxx"
 ```
@@ -56,7 +56,7 @@ export PHILIPS_HUE_IP="xxx.xxx.xxx.xxx"
 
  Make an HTTP POST request of the following to http://YourHueHub/api
 
-```
+```json
 {"username": "YourHash", "devicetype": "YourAppName"}
 ```
  
