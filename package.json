@@ -19,7 +19,8 @@
     "url": "https://github.com/kingbin/hubot-philipshue/issues"
   },
   "dependencies": {
-    "coffee-script": "~1.6"
+    "coffee-script": "~1.6",
+    "node-hue-api": "^1.0.5"
   },
   "devDependencies": {
     "mocha": "~1.14.0",
