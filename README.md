@@ -2,7 +2,7 @@
 
 This is a hubot plugin that will control your philips hue lights
 
-[![Build Status](https://travis-ci.org/hubot-scripts/hubot-example.png)](https://travis-ci.org/kingbin/hubot-philipshue)
+[![Build Status](https://travis-ci.org/kingbin/hubot-philipshue.png)](https://travis-ci.org/kingbin/hubot-philipshue)
 
 ## Dependencies:
 - [A Local Hubot Installation](https://github.com/github/hubot/blob/master/docs/README.md "A Local Hubot Installation")
