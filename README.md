@@ -112,7 +112,9 @@ $ curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d
 ## Notes:
 
 ## Author:
-   kingbin - chris.blazek@gmail.com
+   [kingbin](https://github.com/kingbin "kingbin")
    
 ## Contributor:
-   bschlief - bschlief@gmail.com
+   [stephenyeargin](https://github.com/stephenyeargin "stephenyeargin")
+   
+   [bschlief](https://github.com/bschlief "bschlief")
