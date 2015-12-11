@@ -1,84 +1,74 @@
 # hubot-philipshue
 
-This is a hubot plugin that will control your philips hue lights
+This is a Hubot script package that will control your Philips Hue lights.
 
 [![Build Status](https://travis-ci.org/kingbin/hubot-philipshue.png)](https://travis-ci.org/kingbin/hubot-philipshue)
 
-## Dependencies:
+## Dependencies
+
 - [A Local Hubot Installation](https://github.com/github/hubot/blob/master/docs/README.md "A Local Hubot Installation")
 - [Philips Hue Lightbulb system](https://www.meethue.com/en-US "Philips Hue Lightbulb system")
--	I'm using [campfire](https://campfirenow.com/ "campfire") to interact with my system.
+-	I'm using [campfire](https://campfirenow.com/ "campfire") to interact with my system. Other [adapters](https://github.com/github/hubot/blob/master/docs/adapters.md) should work as well.
 
 Uses the [`node-hue-api`](https://github.com/peter-murray/node-hue-api "Node Hue API") NPM package to communicate with the hue bridge.
 
 ## Installation
 
-###The Quick Installation
 Run the following command to make sure the module is installed to your local Hubot instance.
 
 ```bash
 $ npm install hubot-philipshue --save
 ```
 
-###Manual Installation
-Run the following command to install the module in your hubot project.
-
-```bash
-$ npm install hubot-philipshue
-```
-
-Add the package `hubot-philipshue` as a dependency in your Hubot `package.json` file.
-
-```json
-    "dependencies": {
-      "hubot-philipshue": "*"
-    }
-```
-
-###And then turn the Hubot script on
 To enable the script, add the `hubot-philipshue` entry to the `external-scripts.json` file (you may need to create this file).
 
 ```json
 ["hubot-philipshue"]
 ```
 
-## Configuration:
-####Environment variables:
+## Configuration
+
+### Environment variables
+
+| Variable           | Description                                |
+| ------------------ | ------------------------------------------ |
+| `PHILIPS_HUE_HASH` | The generated secret hash described below. |
+| `PHILIPS_HUE_IP`   | The IP address of your Hue Hub.            |
 
 ```bash
-export PHILIPS_HUE_HASH="secrets"
+export PHILIPS_HUE_HASH="YourSecretHash"
 export PHILIPS_HUE_IP="xxx.xxx.xxx.xxx"
 ```
 
-####Getting your Hue Hash
+### Getting your Hue Hash
 
- This needs to be done once, it seems older versions of the Hue bridge used an md5 hash as a 'username' but now you can use anything.
+There is a two-step process to generating the credentials above.
 
- Make an HTTP POST request of the following to http://YourHueHub/api
+First, press the button on your Hue Hub. This puts the device in a mode to accept new connections.
+
+Second, make an HTTP POST request of the JSON payload below to `http://YourHueHub/api`. You can use the [Clip API Debugger](http://www.developers.meethue.com/documentation/getting-started) on your base station as well.
+
+```bash
+$ curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d '{"devicetype": "YourAppName"}'
+```
+
+The Hub will respond with:
 
 ```json
-{"username": "YourHash", "devicetype": "YourAppName"}
+{"success":{"username":"YourSecretHash"}}
 ```
- 
-If you have not pressed the button on the Hue Hub you will receive an error like this;
+
+The `username` property will contain the hash key to use in the `PHIPLIPS_HUE_HASH` environment variable.
+
+#### Troubleshooting
+
+If you have not pressed the button on the Hue Hub you will receive an error like this:
 
 ```json
 {"error":{"type":101,"address":"/","description":"link button not pressed"}}
 ```
 
-Press the link button on the hub and try again and you should receive;
-
-```json
-{"success":{"username":"YourHash"}}
-```
-
-The key above will be the username you sent, remember this, you'll need it in all future requests
-
-Example command Line script to set up your hash and Hubot Philips app:
-
-```bash
-$ curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d '{"username": "YourHash", "devicetype": "YourAppName"}'
-```
+Press the link button on the hub and try again.
 
 ## Commands:
 -   hubot hue lights - list all lights
