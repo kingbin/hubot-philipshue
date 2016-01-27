@@ -37,6 +37,7 @@
 #   hubot hue hash - get a hash code (press the link button)
 #   hubot hue linkbutton - programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
+#   hubot hue (colors|colorloop|colorloop) (on|off) light <light number> - enable or disable the colorloop effect
 #   hubot hue hsb light <light number> <hue 0-65535> <saturation 0-254> <brightness 0-254>
 #   hubot hue xy light <light number> <x 0.0-1.0> <y 0.0-1.0>
 #   hubot hue ct light <light number> <color temp 153-500>
@@ -194,6 +195,19 @@ module.exports = (robot) ->
       alert_text = 'long alert'
       state = lightState.create().alertLong()
     msg.send "Setting light #{light} to #{alert_text}"
+    api.setLightState light, state, (err, status) ->
+      return handleError msg, err if err
+      robot.logger.debug status
+
+  robot.respond /hue (?:colors|colorloop|loop) (on|off) light (.+)/i, (msg) ->
+    [loop_status,light] = msg.match[1..2]
+    if loop_status == 'on'
+      colorloop_text = 'on'
+      state = lightState.create().effect('colorloop')
+    else
+      colorloop_text = 'off'
+      state = lightState.create().effect('none')
+    msg.send "Setting light #{light} colorloop to #{colorloop_text}"
     api.setLightState light, state, (err, status) ->
       return handleError msg, err if err
       robot.logger.debug status

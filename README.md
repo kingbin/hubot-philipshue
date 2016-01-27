@@ -100,6 +100,7 @@ $ curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d
 -   hubot hue hash - get a hash code (press the link button)
 -   hubot hue linkbutton - programatically press the link button
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
+-   hubot hue {colors|colorloop|loop} {on|off} light {light number} - enable or disable the colorloop effect
 -   hubot hue group {group name}=[{comma separated list of light indexes}]
 -   hubot hue ls groups - lists the groups of lights
 -   hubot hue rm group {group name} - remove grouping of lights named <group name>
