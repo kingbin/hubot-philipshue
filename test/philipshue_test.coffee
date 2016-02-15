@@ -39,6 +39,8 @@ describe 'philips-hue', ->
     expect(@robot.respond).to.have.been.calledWith(/hue turn light (\d+) (on|off)/i)
   it 'registers a light alert listener', ->
     expect(@robot.respond).to.have.been.calledWith(/hue (alert|alerts) light (.+)/i)
+  it 'registers a colorloop listener', ->
+    expect(@robot.respond).to.have.been.calledWith(/hue (?:colors|colorloop|loop) (on|off) light (.+)/i)
   it 'registers a config listener', ->
     expect(@robot.respond).to.have.been.calledWith(/hue config/i)
   it 'registers a hash listener', ->
