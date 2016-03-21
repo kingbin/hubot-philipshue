@@ -30,6 +30,7 @@
 #
 # Commands:
 #   hubot hue lights - list all lights
+#   hubot hue lights on - list on lights
 #   hubot hue light <light number>  - shows light status
 #   hubot hue turn light <light number> <on|off> - flips the switch
 #   hubot hue groups - groups lights together to control with one API call
@@ -95,13 +96,29 @@ module.exports = (robot) ->
       msg.send "Group deleted!"
 
   # LIGHT COMMANDS
-  robot.respond /hue lights/i, (msg) ->
+  robot.respond /hue lights$/i, (msg) ->
     api.lights (err, lights) ->
       return handleError msg, err if err
       robot.logger.debug lights
       msg.send "Connected hue lights:"
       for light in lights.lights
         msg.send "- #{light.id}: '#{light.name}'"
+
+  robot.respond /hue lights on$/i, (msg) ->
+    api.lights (err, lights) ->
+      return handleError msg, err if err
+      robot.logger.debug lights
+      msg.send "On hue lights:"
+      for light in lights.lights
+        api.lightStatus light.id, (err, light) ->
+          return handleError msg, err if err
+          robot.logger.debug light
+          id = 0
+          for _light in lights.lights
+            id = _light.id if _light.name is light.name
+          if light.state.on
+            msg.send "- #{id}:'#{light.name}'"
+
 
   robot.respond /hue light (.*)/i, (msg) ->
     light = msg.match[1]
