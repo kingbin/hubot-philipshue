@@ -45,5 +45,3 @@ describe 'philips-hue', ->
     expect(@robot.respond).to.have.been.calledWith(/hue config/i)
   it 'registers a hash listener', ->
     expect(@robot.respond).to.have.been.calledWith(/hue hash/i)
-  it 'registers a link button listener', ->
-    expect(@robot.respond).to.have.been.calledWith(/hue (link|linkbutton|link button)/i)

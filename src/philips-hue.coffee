@@ -1,10 +1,7 @@
 # Description:
 #   Control your Philips Hue Lights from HUBOT! BAM, easy candy for the kids
 #
-# Dependencies:
-#
 # Configuration:
-# This script is dependent on environment variables:
 #   PHILIPS_HUE_HASH : export PHILIPS_HUE_HASH="secrets"
 #   PHILIPS_HUE_IP : export PHILIPS_HUE_IP="xxx.xxx.xxx.xxx"
 #
@@ -35,7 +32,6 @@
 #   hubot hue groups - groups lights together to control with one API call
 #   hubot hue config - reads bridge config
 #   hubot hue hash - get a hash code (press the link button)
-#   hubot hue linkbutton - programatically press the link button
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
 #   hubot hue (colors|colorloop|colorloop) (on|off) light <light number> - enable or disable the colorloop effect
 #   hubot hue hsb light <light number> <hue 0-65535> <saturation 0-254> <brightness 0-254>
@@ -49,8 +45,6 @@
 #   hubot hue @<group name> hsb=(<hue>,<sat>,<bri>) - set hsb value for all lights in group
 #   hubot hue @<group name> xy=(<x>,<y>) - set x, y value for all lights in group
 #   hubot hue @<group name> ct=<color temp> - set color temp for all lights in group
-#
-# Notes:
 #
 # Author:
 #   kingbin - chris.blazek@gmail.com
@@ -231,11 +225,6 @@ module.exports = (robot) ->
               msg.send line.error.description
             if (line.success)
               msg.send "Hash:" + line.success.username
-
-  robot.respond /hue (link|linkbutton|link button)/i, (msg) ->
-    api.pressLinkButton (err, status) ->
-      return handleError msg, err if err
-      msg.send "Link button pressed!"
 
   # HELPERS
   groupMap = (group_name, callback) ->
