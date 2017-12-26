@@ -1,0 +1,5 @@
+[
+  {"success":{ "address": "/groups/1/action/on", "value": true}},
+  {"success":{ "address": "/groups/1/action/effect", "value":"colorloop"}},
+  {"success":{ "address": "/groups/1/action/hue", "value":6000}}
+]

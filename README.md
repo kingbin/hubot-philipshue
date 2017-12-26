@@ -85,14 +85,12 @@ Press the link button on the hub and try again.
     - color temperature values use [Mired color temperature](http://en.wikipedia.org/wiki/Mired) 
     - color temperature range: 153-500 (153 appears 6500K, 500 appears 2000K)
 -   hubot hue turn light {light number} {on|off} - flips the switch
--   hubot hue groups - groups lights together to control with one API call
+-   hubot hue groups - lists the groups of lights
 -   hubot hue config - reads bridge config
 -   hubot hue hash - get a hash code (press the link button)
--   hubot hue linkbutton - programatically press the link button
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
 -   hubot hue {colors|colorloop|loop} {on|off} light {light number} - enable or disable the colorloop effect
 -   hubot hue group {group name}=[{comma separated list of light indexes}]
--   hubot hue ls groups - lists the groups of lights
 -   hubot hue rm group {group name} - remove grouping of lights named <group name>
 -   hubot hue @{group name} off - turn all lights in <group name> off
 -   hubot hue @{group name} on - turn all lights in <group name> on
@@ -105,7 +103,7 @@ Press the link button on the hub and try again.
 ## Author:
    [kingbin](https://github.com/kingbin "kingbin")
    
-## Contributor:
+## Contributors:
    [stephenyeargin](https://github.com/stephenyeargin "stephenyeargin")
    
    [bschlief](https://github.com/bschlief "bschlief")
