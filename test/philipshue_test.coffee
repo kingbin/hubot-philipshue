@@ -92,6 +92,35 @@ describe 'philips-hue', ->
     )
 
   # hubot hue turn light <light number> <on|off>
+  it 'turns a light off', () ->
+    selfRoom = @room
+    testPromise = new Promise (resolve, reject) ->
+      selfRoom.user.say('alice', '@hubot hue turn light 1 off')
+      setTimeout(() ->
+        resolve()
+      , 1000)
+
+    testPromise.then ((result) ->
+      expect(selfRoom.messages).to.eql [
+        ['alice', '@hubot hue turn light 1 off']
+        ['hubot', 'Setting light 1 to off']
+      ]
+    )
+
+  it 'turns a light on', () ->
+    selfRoom = @room
+    testPromise = new Promise (resolve, reject) ->
+      selfRoom.user.say('alice', '@hubot hue turn light 1 on')
+      setTimeout(() ->
+        resolve()
+      , 1000)
+
+    testPromise.then ((result) ->
+      expect(selfRoom.messages).to.eql [
+        ['alice', '@hubot hue turn light 1 on']
+        ['hubot', 'Setting light 1 to on']
+      ]
+    )
 
   # hubot hue groups
   it 'returns groups', () ->
@@ -244,7 +273,7 @@ describe 'philips-hue', ->
       ]
     )
 
-  # hubot hue @<group name> off
+  # hubot hue @<group name> <on|off> - turn all lights in <group name> on or off
   it 'turns a group off', () ->
     selfRoom = @room
     testPromise = new Promise (resolve, reject) ->
@@ -260,7 +289,6 @@ describe 'philips-hue', ->
       ]
     )
 
-  # hubot hue @<group name> on
   it 'turns a group on', () ->
     selfRoom = @room
     testPromise = new Promise (resolve, reject) ->

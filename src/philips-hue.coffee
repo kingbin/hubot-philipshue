@@ -38,8 +38,7 @@
 #   hubot hue ct light <light number> <color temp 153-500>
 #   hubot hue group <group name>=[<comma separated list of light indexes>]
 #   hubot hue rm group <group number> - remove grouping of lights with ID <group number>
-#   hubot hue @<group name> off - turn all lights in <group name> off
-#   hubot hue @<group name> on - turn all lights in <group name> on
+#   hubot hue @<group name> <on|off> - turn all lights in <group name> on or off
 #   hubot hue @<group name> hsb=(<hue>,<sat>,<bri>) - set hsb value for all lights in group
 #   hubot hue @<group name> xy=(<x>,<y>) - set x, y value for all lights in group
 #   hubot hue @<group name> ct=<color temp> - set color temp for all lights in group
