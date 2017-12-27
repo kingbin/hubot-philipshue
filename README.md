@@ -87,7 +87,6 @@ Press the link button on the hub and try again.
 -   hubot hue turn light {light number} {on|off} - flips the switch
 -   hubot hue groups - lists the groups of lights
 -   hubot hue config - reads bridge config
--   hubot hue hash - get a hash code (press the link button)
 -   hubot hue {alert|alerts} light {light number} - blink once or blink for 10 seconds specific light
 -   hubot hue {colors|colorloop|loop} {on|off} light {light number} - enable or disable the colorloop effect
 -   hubot hue group {group name}=[{comma separated list of light indexes}]
