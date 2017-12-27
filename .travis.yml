@@ -1,12 +1,18 @@
 language: node_js
 node_js:
   - "node"
-  - "6"
-  - "5"
-  - "4"
+  - "lts/*"
 sudo: false
 cache:
   directories:
     - node_modules
 notifications:
   email: false
+deploy:
+  provider: npm
+  email: chris.blazek@gmail.com
+  api_key:
+    secure: gMqW/lvDBPQ3JVtOLSvDZaa1O8Due4VswldEEWClfOYAnfkpveVFHEef9h/fyMId6n2CYOrGpd2gZRcQkhhc4Ied8cetALvB1el2xKl9JOzV4A2TNLUlHs9qE5wDBX5y/XvHwaF772lFV5hQsLCNZqPDg0qrfmDO2lq2sxtDvI4=
+  on:
+    branch: production
+
