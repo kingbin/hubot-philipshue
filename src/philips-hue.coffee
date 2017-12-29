@@ -23,25 +23,22 @@
 # ie: curl -v -H "Content-Type: application/json" -X POST 'http://YourHueHub/api' -d '{"username": "YourHash", "devicetype": "YourAppName"}'
 #
 # Dependencies:
-#   "node-hue-api": "^1.0.5"
+#   "node-hue-api": "^2.4"
 #
 # Commands:
 #   hubot hue lights - list all lights
 #   hubot hue light <light number>  - shows light status
 #   hubot hue turn light <light number> <on|off> - flips the switch
-#   hubot hue groups - groups lights together to control with one API call
+#   hubot hue groups - lists the groups of lights
 #   hubot hue config - reads bridge config
-#   hubot hue hash - get a hash code (press the link button)
 #   hubot hue (alert|alerts) light <light number> - blink once or blink for 10 seconds specific light
 #   hubot hue (colors|colorloop|colorloop) (on|off) light <light number> - enable or disable the colorloop effect
 #   hubot hue hsb light <light number> <hue 0-65535> <saturation 0-254> <brightness 0-254>
 #   hubot hue xy light <light number> <x 0.0-1.0> <y 0.0-1.0>
 #   hubot hue ct light <light number> <color temp 153-500>
 #   hubot hue group <group name>=[<comma separated list of light indexes>]
-#   hubot hue ls groups - lists the groups of lights
-#   hubot hue rm group <group name> - remove grouping of lights named <group name>
-#   hubot hue @<group name> off - turn all lights in <group name> off
-#   hubot hue @<group name> on - turn all lights in <group name> on
+#   hubot hue rm group <group number> - remove grouping of lights with ID <group number>
+#   hubot hue @<group name> <on|off> - turn all lights in <group name> on or off
 #   hubot hue @<group name> hsb=(<hue>,<sat>,<bri>) - set hsb value for all lights in group
 #   hubot hue @<group name> xy=(<x>,<y>) - set x, y value for all lights in group
 #   hubot hue @<group name> ct=<color temp> - set color temp for all lights in group
@@ -110,13 +107,15 @@ module.exports = (robot) ->
       msg.send "- Unique ID: #{light.uniqueid}"
       msg.send "- Software Version: #{light.swversion}"
 
-  robot.respond /hue @(\d+) hsb=\((\d+),(\d+),(\d+)\)/i, (msg) ->
-    [group, vHue, vSat, vBri] = msg.match[1..4]
-    msg.send "Setting light group #{group} to: Hue=#{vHue}, Saturation=#{vSat}, Brightness=#{vBri}"
-    state = lightState.create().on(true).bri(vBri).hue(vHue).sat(vSat)
-    api.setGroupLightState group, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+  robot.respond /hue @(\w+) hsb=\((\d+),(\d+),(\d+)\)/i, (msg) ->
+    [group_name, vHue, vSat, vBri] = msg.match[1..4]
+    groupMap group_name, (group) ->
+      return msg.send "Could not find '#{group_name}' in list of groups" unless group
+      msg.send "Setting light group #{group} to: Hue=#{vHue}, Saturation=#{vSat}, Brightness=#{vBri}"
+      state = lightState.create().on(true).bri(vBri).hue(vHue).sat(vSat)
+      api.setGroupLightState group, state, (err, status) ->
+        return handleError msg, err if err
+        robot.logger.debug status
 
   robot.respond /hue hsb light (\d+) (\d+) (\d+) (\d+)/i, (msg) ->
     [light, vHue, vSat, vBri] = msg.match[1..4]
@@ -126,7 +125,7 @@ module.exports = (robot) ->
       return handleError msg, err if err
       robot.logger.debug status
 
-  robot.respond /hue @(\d+) xy=\(([0-9]*[.][0-9]+),([0-9]*[.][0-9]+)\)/i, (msg) ->
+  robot.respond /hue @(\w+) xy=\(([0-9]*[.][0-9]+),([0-9]*[.][0-9]+)\)/i, (msg) ->
     [group_name,x,y] = msg.match[1..3]
     groupMap group_name, (group) ->
       return msg.send "Could not find '#{group_name}' in list of groups" unless group
@@ -214,17 +213,6 @@ module.exports = (robot) ->
       msg.send "Base Station: '#{config.name}'"
       msg.send "IP: #{config.ipaddress} / MAC: #{config.mac} / ZigBee Channel: #{config.zigbeechannel}"
       msg.send "Software: #{config.swversion} / API: #{config.apiversion} / Update Available: #{config.swupdate.updatestate}"
-
-  robot.respond /hue hash/i, (msg) ->
-    msg.http("http://#{base_url}/api")
-      .headers(Accept: 'application/json')
-      .post(JSON.stringify({devicetype: "hubot"})) (err, res, body) ->
-        for line in JSON.parse(body)
-          do (line) ->
-            if (line.error)
-              msg.send line.error.description
-            if (line.success)
-              msg.send "Hash:" + line.success.username
 
   # HELPERS
   groupMap = (group_name, callback) ->
