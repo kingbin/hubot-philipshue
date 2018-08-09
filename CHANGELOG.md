@@ -1,4 +1,34 @@
-### updating vulnerable packages (HEAD -> v0.0.13)
+### bumped to version v0.0.13 (HEAD -> release-v0.0.13)
+
+>Author: Chris Blazek (chris.blazek@gmail.com)
+
+>Author Date: Thu, 9 Aug 2018 10:49:06 -0500
+
+>Commiter: Chris Blazek (chris.blazek@gmail.com)
+
+>Commit Date: Thu, 9 Aug 2018 10:49:06 -0500
+
+>Commit: 65e9be6d29b729273cf2c58c1d44232b30cbefb4 
+
+
+
+
+### CHANGELOG.md (v0.0.13)
+
+>Author: Chris Blazek (chris.blazek@gmail.com)
+
+>Author Date: Thu, 9 Aug 2018 10:42:26 -0500
+
+>Commiter: Chris Blazek (chris.blazek@gmail.com)
+
+>Commit Date: Thu, 9 Aug 2018 10:42:26 -0500
+
+>Commit: dfee1d383366090aafd4abbe50c0c8e3187abc7e 
+
+
+
+
+### updating vulnerable packages
 
 >Author: Chris Blazek (chris.blazek@gmail.com)
 
@@ -13,7 +43,7 @@
 
 
 
-### Prepared to release 0.0.12. (tag: v0.0.12, origin/master, origin/HEAD, master, develop)
+### Prepared to release 0.0.12. (tag: v0.0.12, origin/master, origin/HEAD, master)
 
 >Author: Stephen Yeargin (stephen.yeargin@gmail.com)
 
