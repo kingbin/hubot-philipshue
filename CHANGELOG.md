@@ -1,4 +1,49 @@
-### bumped to version v0.0.13 (HEAD -> release-v0.0.13)
+### vulnerability updates (HEAD -> master)
+
+>Author: Chris Blazek (chris.blazek@gmail.com)
+
+>Author Date: Fri, 16 Nov 2018 15:05:25 -0600
+
+>Commiter: Chris Blazek (chris.blazek@gmail.com)
+
+>Commit Date: Fri, 16 Nov 2018 15:05:25 -0600
+
+>Commit: 164ce4e2bb9380071a4aeece7d4a47a6a63fc8bf 
+
+
+
+
+### fixed package-lock.json update (hotfix-v0.0.13)
+
+>Author: Chris Blazek (chris.blazek@gmail.com)
+
+>Author Date: Thu, 9 Aug 2018 11:13:26 -0500
+
+>Commiter: Chris Blazek (chris.blazek@gmail.com)
+
+>Commit Date: Thu, 9 Aug 2018 11:13:26 -0500
+
+>Commit: 265b793fe9e38992eb4abacd3bda543b7085d5f6 
+
+
+
+
+### CHANGELOG.md
+
+>Author: Chris Blazek (chris.blazek@gmail.com)
+
+>Author Date: Thu, 9 Aug 2018 10:49:24 -0500
+
+>Commiter: Chris Blazek (chris.blazek@gmail.com)
+
+>Commit Date: Thu, 9 Aug 2018 10:49:24 -0500
+
+>Commit: 254c0c2a76bf90287f2dd5128d863513eec960fd 
+
+
+
+
+### bumped to version v0.0.13
 
 >Author: Chris Blazek (chris.blazek@gmail.com)
 
@@ -43,7 +88,7 @@
 
 
 
-### Prepared to release 0.0.12. (tag: v0.0.12, origin/master, origin/HEAD, master)
+### Prepared to release 0.0.12. (tag: v0.0.12)
 
 >Author: Stephen Yeargin (stephen.yeargin@gmail.com)
 
