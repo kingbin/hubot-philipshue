@@ -9,12 +9,18 @@ helper = new Helper('../src/philips-hue.coffee')
 
 describe 'philips-hue', ->
   beforeEach ->
+    process.env.HUBOT_LOG_LEVEL = 'ERROR'
     process.env.PHILIPS_HUE_IP = '1.2.3.4'
     process.env.PHILIPS_HUE_HASH = 'abc0123deadbeaf'
-
+    nock.disableNetConnect()
     @room = helper.createRoom()
+    nock('http://1.2.3.4')
+      .get('/api/config')
+      .replyWithFile(200, __dirname + '/fixtures/config.json')
 
-    do nock.disableNetConnect
+    nock('http://1.2.3.4')
+      .get("/api/abc0123deadbeaf")
+      .reply 200, fs.readFileSync('test/fixtures/datastore.json')
 
     nock('http://1.2.3.4')
       .get("/api/abc0123deadbeaf/config")
@@ -27,6 +33,14 @@ describe 'philips-hue', ->
     nock('http://1.2.3.4')
       .post("/api/abc0123deadbeaf/groups")
       .reply 200, fs.readFileSync('test/fixtures/group-create.json')
+
+    nock('http://1.2.3.4')
+      .get("/api/abc0123deadbeaf/groups/0")
+      .reply 200, fs.readFileSync('test/fixtures/group-0.json')
+
+    nock('http://1.2.3.4')
+      .get("/api/abc0123deadbeaf/groups/1")
+      .reply 200, fs.readFileSync('test/fixtures/group-1.json')
 
     nock('http://1.2.3.4')
       .get("/api/abc0123deadbeaf/lights")
@@ -64,8 +78,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue lights']
         ['hubot', 'Connected hue lights:']
-        ['hubot', '- 1: \'Hue Lamp 1\'']
-        ['hubot', '- 2: \'Hue Lamp 2\'']
+        ['hubot', '- 1: \'Hue color lamp 7\'']
       ]
     )
 
@@ -82,12 +95,12 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue light 1']
         ['hubot', 'Light Status:']
-        ['hubot', '- On: true']
+        ['hubot', '- On: false']
         ['hubot', '- Reachable: true']
-        ['hubot', '- Name: \'LC 1\'']
-        ['hubot', '- Model: LC0015 - Living Colors']
-        ['hubot', '- Unique ID: de:ad:be:ef:00:11']
-        ['hubot', '- Software Version: 1.0.3']
+        ['hubot', '- Name: \'Hue color lamp 7\'']
+        ['hubot', '- Model: LCT007 - Extended color light']
+        ['hubot', '- Unique ID: 00:17:88:01:00:bd:c7:b9-0b']
+        ['hubot', '- Software Version: 5.105.0.21169']
       ]
     )
 
@@ -103,7 +116,8 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue turn light 1 off']
-        ['hubot', 'Setting light 1 to off']
+        ['hubot', 'Turning light 1 off ...']
+        ['hubot', 'Light 1 turned off']
       ]
     )
 
@@ -118,7 +132,8 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue turn light 1 on']
-        ['hubot', 'Setting light 1 to on']
+        ['hubot', 'Turning light 1 on ...']
+        ['hubot', 'Light 1 turned on']
       ]
     )
 
@@ -155,7 +170,7 @@ describe 'philips-hue', ->
         ['alice', '@hubot hue config']
         ['hubot', 'Base Station: \'Philips hue\'']
         ['hubot', 'IP: 192.168.1.7 / MAC: 00:17:88:00:00:00 / ZigBee Channel: 15']
-        ['hubot', 'Software: 01012917 / API: 1.3.0 / Update Available: 2']
+        ['hubot', 'Software: 01012917 / API: 1.3.0']
       ]
     )
 
@@ -171,12 +186,29 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue alert light 1']
-        ['hubot', 'Setting light 1 to short alert']
+        ['hubot', 'Setting light 1 to short alert ...']
+        ['hubot', 'Light 1 set to short alert']
+      ]
+    )
+
+  it 'long alerts a light', () ->
+    selfRoom = @room
+    testPromise = new Promise (resolve, reject) ->
+      selfRoom.user.say('alice', '@hubot hue alerts light 1')
+      setTimeout(() ->
+        resolve()
+      , 1000)
+
+    testPromise.then ((result) ->
+      expect(selfRoom.messages).to.eql [
+        ['alice', '@hubot hue alerts light 1']
+        ['hubot', 'Setting light 1 to long alert ...']
+        ['hubot', 'Light 1 set to long alert']
       ]
     )
 
   # hubot hue (colors|colorloop|colorloop) (on|off) light <light number>
-  it 'sets a light to colorloop', () ->
+  it 'sets a light to colorloop on', () ->
     selfRoom = @room
     testPromise = new Promise (resolve, reject) ->
       selfRoom.user.say('alice', '@hubot hue colorloop on light 1')
@@ -187,7 +219,24 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue colorloop on light 1']
-        ['hubot', 'Setting light 1 colorloop to on']
+        ['hubot', 'Setting light 1 colorloop to on ...']
+        ['hubot', 'Light 1 colorloop set to on']
+      ]
+    )
+
+  it 'sets a light to colorloop off', () ->
+    selfRoom = @room
+    testPromise = new Promise (resolve, reject) ->
+      selfRoom.user.say('alice', '@hubot hue colorloop off light 1')
+      setTimeout(() ->
+        resolve()
+      , 1000)
+
+    testPromise.then ((result) ->
+      expect(selfRoom.messages).to.eql [
+        ['alice', '@hubot hue colorloop off light 1']
+        ['hubot', 'Setting light 1 colorloop to off ...']
+        ['hubot', 'Light 1 colorloop set to off']
       ]
     )
 
@@ -204,6 +253,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue hsb light 1 3000 200 100']
         ['hubot', 'Setting light 1 to: Hue=3000, Saturation=200, Brightness=100']
+        ['hubot', 'Light 1 updated']
       ]
     )
 
@@ -220,6 +270,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue xy light 1 0.5 0.6']
         ['hubot', 'Setting light 1 to: X=0.5, Y=0.6']
+        ['hubot', 'Light 1 updated']
       ]
     )
 
@@ -236,6 +287,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue ct light 1 200']
         ['hubot', 'Setting light 1 to: CT=200']
+        ['hubot', 'Light 1 updated']
       ]
     )
 
@@ -251,7 +303,7 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue group livingroom=[1,2,3]']
-        ['hubot', 'Setting livingroom to 1, 2, 3']
+        ['hubot', 'Setting livingroom to 1, 2, 3 ...']
         ['hubot', 'Group created!']
       ]
     )
@@ -268,7 +320,7 @@ describe 'philips-hue', ->
     testPromise.then ((result) ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue rm group 1']
-        ['hubot', 'Deleting 1']
+        ['hubot', 'Deleting Group 1 ...']
         ['hubot', 'Group deleted!']
       ]
     )
@@ -286,6 +338,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue @all off']
         ['hubot', 'Setting light group 0 to off']
+        ['hubot', 'Group all updated']
       ]
     )
 
@@ -301,6 +354,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue @all on']
         ['hubot', 'Setting light group 0 to on']
+        ['hubot', 'Group all updated']
       ]
     )
 
@@ -317,6 +371,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue @all hsb=(3000,200,100)']
         ['hubot', 'Setting light group 0 to: Hue=3000, Saturation=200, Brightness=100']
+        ['hubot', 'Group all updated']
       ]
     )
 
@@ -333,6 +388,7 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue @all xy=(0.5,0.6)']
         ['hubot', 'Setting light group 0 to: X=0.5, Y=0.6']
+        ['hubot', 'Group all updated']
       ]
     )
 
@@ -349,5 +405,6 @@ describe 'philips-hue', ->
       expect(selfRoom.messages).to.eql [
         ['alice', '@hubot hue @all ct=200']
         ['hubot', 'Setting light group 0 to: CT=200']
+        ['hubot', 'Group all updated']
       ]
     )

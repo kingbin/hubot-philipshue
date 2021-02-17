@@ -1,19 +1,21 @@
 {
-	"state": {
-		"hue": 50000,
-		"on": true,
-		"effect": "none",
-		"alert": "none",
-		"bri": 200,
-		"sat": 200,
-		"ct": 500,
-		"xy": [0.5, 0.5],
-		"reachable": true,
-		"colormode": "hs"
-	},
-	"type": "Living Colors",
-	"name": "LC 1",
-	"modelid": "LC0015",
-	"uniqueid": "de:ad:be:ef:00:11",
-	"swversion": "1.0.3"
+  "state": {
+    "hue": 50000,
+    "on": true,
+    "effect": "none",
+    "alert": "none",
+    "bri": 200,
+    "sat": 200,
+    "ct": 500,
+    "xy": [
+      0.5,
+      0.5
+    ],
+    "reachable": true,
+    "colormode": "hs"
+  },
+  "type": "Living Colors",
+  "name": "LC 1",
+  "modelid": "LC0015",
+  "swversion": "1.0.3"
 }
