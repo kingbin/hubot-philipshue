@@ -46,58 +46,78 @@
 # Author:
 #   kingbin - chris.blazek@gmail.com
 
-hue = require("node-hue-api")
-HueApi = hue.HueApi
-lightState = hue.lightState
+hue = require('node-hue-api').v3
+LightState = hue.lightStates.LightState
+GroupLightState = hue.lightStates.GroupLightState
 
 module.exports = (robot) ->
-  base_url = process.env.PHILIPS_HUE_IP
+  baseUrl = process.env.PHILIPS_HUE_IP
   hash  = process.env.PHILIPS_HUE_HASH
-  api = new HueApi(base_url, hash)
-  state = lightState.create();
+  # Connect based on provided string
+  if /^https\:/i.test(baseUrl)
+    hueApi = hue.api.createLocal(baseUrl).connect(hash)
+  else
+    hueApi = hue.api.createInsecureLocal(baseUrl).connect(hash)
+  state = new LightState()
 
   # GROUP COMMANDS
   robot.respond /hue (?:ls )?groups/i, (msg) ->
-    api.groups (err, groups) ->
-      return handleError msg, err if err
+    hueApi.then (api) ->
+      api.groups.getAll()
+    .then (groups) ->
       robot.logger.debug groups
       msg.send "Light groups:"
       for group in groups
-        if group.id == '0'
+        if group.id == 0
           msg.send "- #{group.id}: '#{group.name}' (All)"
         else
           msg.send "- #{group.id}: '#{group.name}' (#{group.lights.join(', ')})"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue group (\w+)=(\[((\d)+,)*((\d)+)\])/i, (msg) ->
-    group_name = msg.match[1]
-    group_lights = JSON.parse(msg.match[2])
-    msg.send "Setting #{group_name} to #{group_lights.join(', ')}"
-    api.createGroup group_name, group_lights, (err, response) ->
-      return handleError msg, err if err
-      robot.logger.debug response
+    groupName = msg.match[1]
+    groupLights = JSON.parse(msg.match[2])
+    msg.send "Setting #{groupName} to #{groupLights.join(', ')} ..."
+    hueApi.then (api) ->
+      lightGroup = hue.model.createLightGroup()
+      lightGroup.name = groupName
+      lightGroup.lights = groupLights
+      api.groups.createGroup(lightGroup)
+    .then (group) ->
+      robot.logger.debug group
       msg.send "Group created!"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue rm group (\d)/i, (msg) ->
-    group_id = msg.match[1]
-    msg.send "Deleting #{group_id}"
-    api.deleteGroup group_id, (err, response) ->
-      return handleError msg, err if err
+    groupId = msg.match[1]
+    msg.send "Deleting Group #{groupId} ..."
+    hueApi.then (api) ->
+      api.groups.deleteGroup(groupId)
+    .then (response) ->
       robot.logger.debug response
       msg.send "Group deleted!"
+    .catch (err) ->
+      handleError msg, err
 
   # LIGHT COMMANDS
   robot.respond /hue lights/i, (msg) ->
-    api.lights (err, lights) ->
-      return handleError msg, err if err
+    hueApi.then (api) ->
+      api.lights.getAll()
+    .then (lights) ->
       robot.logger.debug lights
       msg.send "Connected hue lights:"
-      for light in lights.lights
+      for light in lights
         msg.send "- #{light.id}: '#{light.name}'"
+    .catch (err) ->
+      handleError msg, err
 
-  robot.respond /hue light (.*)/i, (msg) ->
-    light = msg.match[1]
-    api.lightStatus light, (err, light) ->
-      return handleError msg, err if err
+  robot.respond /hue light (\d+)/i, (msg) ->
+    lightId = parseInt(msg.match[1], 10)
+    hueApi.then (api) ->
+      api.lights.getLight(lightId)
+    .then (light) ->
       robot.logger.debug light
       msg.send "Light Status:"
       msg.send "- On: #{light.state.on}"
@@ -106,128 +126,176 @@ module.exports = (robot) ->
       msg.send "- Model: #{light.modelid} - #{light.type}"
       msg.send "- Unique ID: #{light.uniqueid}"
       msg.send "- Software Version: #{light.swversion}"
+    .catch (err) ->
+      handleError msg, err
 
-  robot.respond /hue @(\w+) hsb=\((\d+),(\d+),(\d+)\)/i, (msg) ->
-    [group_name, vHue, vSat, vBri] = msg.match[1..4]
-    groupMap group_name, (group) ->
-      return msg.send "Could not find '#{group_name}' in list of groups" unless group
+  robot.respond /hue @(.*) hsb=\((\d+),(\d+),(\d+)\)$/i, (msg) ->
+    [groupName, vHue, vSat, vBri] = msg.match[1..4]
+    groupMap groupName, (group) ->
+      return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
       msg.send "Setting light group #{group} to: Hue=#{vHue}, Saturation=#{vSat}, Brightness=#{vBri}"
-      state = lightState.create().on(true).bri(vBri).hue(vHue).sat(vSat)
-      api.setGroupLightState group, state, (err, status) ->
-        return handleError msg, err if err
-        robot.logger.debug status
+      lightState = new GroupLightState().on(true).bri(vBri).hue(vHue).sat(vSat)
+      hueApi.then (api) ->
+        api.groups.setGroupState(group, lightState)
+      .then (response) ->
+        robot.logger.debug response
+        msg.send "Group #{groupName} updated"
+      .catch (err) ->
+        handleError msg, err
 
   robot.respond /hue hsb light (\d+) (\d+) (\d+) (\d+)/i, (msg) ->
     [light, vHue, vSat, vBri] = msg.match[1..4]
     msg.send "Setting light #{light} to: Hue=#{vHue}, Saturation=#{vSat}, Brightness=#{vBri}"
-    state = lightState.create().on(true).bri(vBri).hue(vHue).sat(vSat)
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+    lightState = new LightState().on(true).bri(vBri).hue(vHue).sat(vSat)
+    hueApi.then (api) ->
+      api.lights.setLightState(light, lightState)
+    .then (response) ->
+      robot.logger.debug response
+      msg.send "Light #{light} updated"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue @(\w+) xy=\(([0-9]*[.][0-9]+),([0-9]*[.][0-9]+)\)/i, (msg) ->
-    [group_name,x,y] = msg.match[1..3]
-    groupMap group_name, (group) ->
-      return msg.send "Could not find '#{group_name}' in list of groups" unless group
+    [groupName,x,y] = msg.match[1..3]
+    groupMap groupName, (group) ->
+      return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
       msg.send "Setting light group #{group} to: X=#{x}, Y=#{y}"
-      state = lightState.create().on(true).xy(x, y)
-      api.setGroupLightState group, state, (err, status) ->
-        return handleError msg, err if err
-        robot.logger.debug status
+      lightState = new GroupLightState().on(true).xy(x, y)
+      hueApi.then (api) ->
+        api.groups.setGroupState(group, lightState)
+      .then (response) ->
+        robot.logger.debug response
+        msg.send "Group #{groupName} updated"
+      .catch (err) ->
+        handleError msg, err
 
   robot.respond /hue xy light (.*) ([0-9]*[.][0-9]+) ([0-9]*[.][0-9]+)/i, (msg) ->
     [light,x,y] = msg.match[1..3]
     msg.send "Setting light #{light} to: X=#{x}, Y=#{y}"
-    state = lightState.create().on(true).xy(x, y)
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+    lightState = new LightState().on(true).xy(x, y)
+    hueApi.then (api) ->
+      api.lights.setLightState(light, lightState)
+    .then (response) ->
+      robot.logger.debug response
+      msg.send "Light #{light} updated"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue @(\w+) ct=(\d{3})/i, (msg) ->
-    [group_name,ct] = msg.match[1..2]
-    groupMap group_name, (group) ->
-      return msg.send "Could not find '#{group_name}' in list of groups" unless group
+    [groupName,ct] = msg.match[1..2]
+    groupMap groupName, (group) ->
+      return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
       msg.send "Setting light group #{group} to: CT=#{ct}"
-      state = lightState.create().on(true).ct(ct)
-      api.setGroupLightState group, state, (err, status) ->
-        return handleError msg, err if err
-        robot.logger.debug status
+      lightState = new GroupLightState().on(true).ct(ct)
+      hueApi.then (api) ->
+        api.groups.setGroupState(group, lightState)
+      .then (response) ->
+        robot.logger.debug response
+        msg.send "Group #{groupName} updated"
+      .catch (err) ->
+        handleError msg, err
 
   robot.respond /hue ct light (.*) (\d{3})/i, (msg) ->
     [light,ct] = msg.match[1..2]
     msg.send "Setting light #{light} to: CT=#{ct}"
-    state = lightState.create().on(true).ct(ct)
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+    lightState = new LightState().on(true).ct(ct)
+    hueApi.then (api) ->
+      api.lights.setLightState(light, lightState)
+    .then (response) ->
+      robot.logger.debug response
+      msg.send "Light #{light} updated"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue @(\w+) (on|off)/i, (msg) ->
-    [group_name, state] = msg.match[1..2]
-    groupMap group_name, (group) ->
-      return msg.send "Could not find '#{group_name}' in list of groups" unless group
+    [groupName, state] = msg.match[1..2]
+    groupMap groupName, (group) ->
+      return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
       msg.send "Setting light group #{group} to #{state}"
-      state = lightState.create().on(state=='on')
-      api.setGroupLightState group, state, (err, status) ->
-        return handleError msg, err if err
-        robot.logger.debug status
+      lightState = new GroupLightState().on(state=='on')
+      hueApi.then (api) ->
+        api.groups.setGroupState(group, lightState)
+      .then (response) ->
+        robot.logger.debug response
+        msg.send "Group #{groupName} updated"
+      .catch (err) ->
+        handleError msg, err
 
   robot.respond /hue turn light (\d+) (on|off)/i, (msg) ->
-    [light, state] = msg.match[1..2]
-    msg.send "Setting light #{light} to #{state}"
-    state = lightState.create().on(state=='on')
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+    lightId = msg.match[1]
+    state = msg.match[2]
+    msg.send "Turning light #{lightId} #{state} ..."
+    hueApi.then (api) ->
+      lightState = new LightState().on(state=='on')
+      api.lights.setLightState(lightId, lightState)
+    .then (status) ->
+      msg.send "Light #{lightId} turned #{state}"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue (alert|alerts) light (.+)/i, (msg) ->
-    [alert_length,light] = msg.match[1..2]
-    if alert_length == 'alert'
-      alert_text = 'short alert'
-      state = lightState.create().alertShort()
+    alertLength = msg.match[1]
+    lightId = parseInt(msg.match[2], 10)
+    if alertLength == 'alert'
+      alertText = 'short alert'
+      lightState = new LightState().alertShort()
     else
-      alert_text = 'long alert'
-      state = lightState.create().alertLong()
-    msg.send "Setting light #{light} to #{alert_text}"
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+      alertText = 'long alert'
+      lightState = new LightState().alertLong()
+    msg.send "Setting light #{lightId} to #{alertText} ..."
+    hueApi.then (api) ->
+      api.lights.setLightState(lightId, lightState)
+    .then (status) ->
+      msg.send "Light #{lightId} set to #{alertText}"
+    .catch (err) ->
+      handleError msg, err
 
   robot.respond /hue (?:colors|colorloop|loop) (on|off) light (.+)/i, (msg) ->
-    [loop_status,light] = msg.match[1..2]
-    if loop_status == 'on'
-      colorloop_text = 'on'
-      state = lightState.create().effect('colorloop')
+    loopState = msg.match[1]
+    lightId = parseInt(msg.match[2], 10)
+    if loopState == 'on'
+      lightState = new LightState().on().effect('colorloop')
     else
-      colorloop_text = 'off'
-      state = lightState.create().effect('none')
-    msg.send "Setting light #{light} colorloop to #{colorloop_text}"
-    api.setLightState light, state, (err, status) ->
-      return handleError msg, err if err
-      robot.logger.debug status
+      lightState = new LightState().on().effect('none')
+    msg.send "Setting light #{lightId} colorloop to #{loopState} ..."
+    hueApi.then (api) ->
+      api.lights.setLightState(lightId, lightState)
+    .then (status) ->
+      msg.send "Light #{lightId} colorloop set to #{loopState}"
+    .catch (err) ->
+      handleError msg, err
 
   # BRIDGE COMMANDS
   robot.respond /hue config/i, (msg) ->
-    api.config (err, config) ->
-      return handleError msg, err if err
+    hueApi.then (api) ->
+      api.configuration.getConfiguration()
+    .then (config) ->
       robot.logger.debug config
       msg.send "Base Station: '#{config.name}'"
       msg.send "IP: #{config.ipaddress} / MAC: #{config.mac} / ZigBee Channel: #{config.zigbeechannel}"
-      msg.send "Software: #{config.swversion} / API: #{config.apiversion} / Update Available: #{config.swupdate.updatestate}"
+      msg.send "Software: #{config.swversion} / API: #{config.apiversion}"
+    .catch (err) ->
+      handleError msg, err
 
   # HELPERS
-  groupMap = (group_name, callback) ->
-    robot.logger.debug "mapping group names to group ids"
-    api.groups (err, groups) ->
-      return handleError msg, err if err
-      group_map = {}
+  groupMap = (groupName, callback) ->
+    hueApi.then (api) ->
+      api.groups.getAll()
+    .then (groups) ->
+      result = {all: 0}
       for group in groups
         robot.logger.debug group
-        if group.id == '0'
-          group_map['all'] = '0'
-        else
-          group_map[group.name.toLowerCase()] = group.id
-      match = group_map[group_name.toLowerCase()]
+        result[group.name.toLowerCase()] = group.id
+      match = result[groupName.toLowerCase()]
       callback match
+    .catch (err) ->
+      console.error err
 
-  handleError = (msg, err) ->
-    msg.send err
+
+  handleError = (res, err) ->
+    robot.logger.debug err
+    switch err.code
+      when 'ETIMEDOUT'
+        res.send 'Connection timed out to Hue bridge.'
+      else
+        res.send "An error ocurred: #{err}"

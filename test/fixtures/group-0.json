@@ -1,0 +1,22 @@
+{
+  "action": {
+    "on": true,
+    "bri": 254,
+    "hue": 33536,
+    "sat": 144,
+    "xy": [
+      0.346,
+      0.3568
+    ],
+    "ct": 201,
+    "effect": "none",
+    "colormode": "xy"
+  },
+  "lights": [
+    "1",
+    "2"
+  ],
+  "name": "Lightset 0",
+  "type":	"LightGroup",
+  "recycle": false
+}
