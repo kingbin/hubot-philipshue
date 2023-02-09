@@ -19,21 +19,21 @@
     "url": "https://github.com/kingbin/hubot-philipshue/issues"
   },
   "dependencies": {
-    "node-hue-api": "^4.0.10"
+    "node-hue-api": "^4.0.11"
   },
   "peerDependencies": {
     "hubot": "3.x"
   },
   "devDependencies": {
-    "chai": "^4.3.4",
+    "chai": "^4.3.7",
     "coffee-script": "^1.12.7",
     "hubot-test-helper": "^1.9.0",
-    "husky": "^6.0.0",
-    "mocha": "^8.3.2",
-    "nock": "^13.0.11",
-    "release-it": "^14.5.0",
-    "sinon": "^10.0.0",
-    "sinon-chai": "^3.6.0"
+    "husky": "^8.0.3",
+    "mocha": "^10.2.0",
+    "nock": "^13.3.0",
+    "release-it": "^15.6.0",
+    "sinon": "^15.0.1",
+    "sinon-chai": "^3.7.0"
   },
   "main": "index.coffee",
   "scripts": {

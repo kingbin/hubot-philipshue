@@ -7,6 +7,11 @@ expect = chai.expect
 
 helper = new Helper('../src/philips-hue.coffee')
 
+# Library setup call
+nock('http://1.2.3.4')
+  .get('/api/config')
+  .replyWithFile(200, __dirname + '/fixtures/config.json')
+
 describe 'philips-hue', ->
   beforeEach ->
     process.env.HUBOT_LOG_LEVEL = 'ERROR'
@@ -14,6 +19,7 @@ describe 'philips-hue', ->
     process.env.PHILIPS_HUE_HASH = 'abc0123deadbeaf'
     nock.disableNetConnect()
     @room = helper.createRoom()
+
     nock('http://1.2.3.4')
       .get('/api/config')
       .replyWithFile(200, __dirname + '/fixtures/config.json')
@@ -64,6 +70,7 @@ describe 'philips-hue', ->
 
   afterEach ->
     @room.destroy()
+    nock.abortPendingRequests()
 
   # hubot hue lights
   it 'returns lights', () ->
