@@ -51,17 +51,19 @@ LightState = hue.lightStates.LightState
 GroupLightState = hue.lightStates.GroupLightState
 
 module.exports = (robot) ->
-  baseUrl = process.env.PHILIPS_HUE_IP
-  hash  = process.env.PHILIPS_HUE_HASH
-  # Connect based on provided string
-  if /^https\:/i.test(baseUrl)
-    hueApi = hue.api.createLocal(baseUrl).connect(hash)
-  else
-    hueApi = hue.api.createInsecureLocal(baseUrl).connect(hash)
-  state = new LightState()
+  # CLIENT
+  getClient = () ->
+    baseUrl = process.env.PHILIPS_HUE_IP
+    hash  = process.env.PHILIPS_HUE_HASH
+    # Connect based on provided string
+    if /^https\:/i.test(baseUrl)
+      return hue.api.createLocal(baseUrl).connect(hash)
+    else
+      return hue.api.createInsecureLocal(baseUrl).connect(hash)
 
   # GROUP COMMANDS
   robot.respond /hue (?:ls )?groups/i, (msg) ->
+    hueApi = getClient()
     hueApi.then (api) ->
       api.groups.getAll()
     .then (groups) ->
@@ -76,6 +78,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue group (\w+)=(\[((\d)+,)*((\d)+)\])/i, (msg) ->
+    hueApi = getClient()
     groupName = msg.match[1]
     groupLights = JSON.parse(msg.match[2])
     msg.send "Setting #{groupName} to #{groupLights.join(', ')} ..."
@@ -91,6 +94,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue rm group (\d)/i, (msg) ->
+    hueApi = getClient()
     groupId = msg.match[1]
     msg.send "Deleting Group #{groupId} ..."
     hueApi.then (api) ->
@@ -103,6 +107,7 @@ module.exports = (robot) ->
 
   # LIGHT COMMANDS
   robot.respond /hue lights/i, (msg) ->
+    hueApi = getClient()
     hueApi.then (api) ->
       api.lights.getAll()
     .then (lights) ->
@@ -114,6 +119,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue light (\d+)/i, (msg) ->
+    hueApi = getClient()
     lightId = parseInt(msg.match[1], 10)
     hueApi.then (api) ->
       api.lights.getLight(lightId)
@@ -130,6 +136,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue @(.*) hsb=\((\d+),(\d+),(\d+)\)$/i, (msg) ->
+    hueApi = getClient()
     [groupName, vHue, vSat, vBri] = msg.match[1..4]
     groupMap groupName, (group) ->
       return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
@@ -144,6 +151,7 @@ module.exports = (robot) ->
         handleError msg, err
 
   robot.respond /hue hsb light (\d+) (\d+) (\d+) (\d+)/i, (msg) ->
+    hueApi = getClient()
     [light, vHue, vSat, vBri] = msg.match[1..4]
     msg.send "Setting light #{light} to: Hue=#{vHue}, Saturation=#{vSat}, Brightness=#{vBri}"
     lightState = new LightState().on(true).bri(vBri).hue(vHue).sat(vSat)
@@ -156,6 +164,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue @(\w+) xy=\(([0-9]*[.][0-9]+),([0-9]*[.][0-9]+)\)/i, (msg) ->
+    hueApi = getClient()
     [groupName,x,y] = msg.match[1..3]
     groupMap groupName, (group) ->
       return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
@@ -170,6 +179,7 @@ module.exports = (robot) ->
         handleError msg, err
 
   robot.respond /hue xy light (.*) ([0-9]*[.][0-9]+) ([0-9]*[.][0-9]+)/i, (msg) ->
+    hueApi = getClient()
     [light,x,y] = msg.match[1..3]
     msg.send "Setting light #{light} to: X=#{x}, Y=#{y}"
     lightState = new LightState().on(true).xy(x, y)
@@ -182,6 +192,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue @(\w+) ct=(\d{3})/i, (msg) ->
+    hueApi = getClient()
     [groupName,ct] = msg.match[1..2]
     groupMap groupName, (group) ->
       return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
@@ -196,6 +207,7 @@ module.exports = (robot) ->
         handleError msg, err
 
   robot.respond /hue ct light (.*) (\d{3})/i, (msg) ->
+    hueApi = getClient()
     [light,ct] = msg.match[1..2]
     msg.send "Setting light #{light} to: CT=#{ct}"
     lightState = new LightState().on(true).ct(ct)
@@ -208,6 +220,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue @(\w+) (on|off)/i, (msg) ->
+    hueApi = getClient()
     [groupName, state] = msg.match[1..2]
     groupMap groupName, (group) ->
       return msg.send "Could not find '#{groupName}' in list of groups" if typeof group == undefined
@@ -222,6 +235,7 @@ module.exports = (robot) ->
         handleError msg, err
 
   robot.respond /hue turn light (\d+) (on|off)/i, (msg) ->
+    hueApi = getClient()
     lightId = msg.match[1]
     state = msg.match[2]
     msg.send "Turning light #{lightId} #{state} ..."
@@ -234,6 +248,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue (alert|alerts) light (.+)/i, (msg) ->
+    hueApi = getClient()
     alertLength = msg.match[1]
     lightId = parseInt(msg.match[2], 10)
     if alertLength == 'alert'
@@ -251,6 +266,7 @@ module.exports = (robot) ->
       handleError msg, err
 
   robot.respond /hue (?:colors|colorloop|loop) (on|off) light (.+)/i, (msg) ->
+    hueApi = getClient()
     loopState = msg.match[1]
     lightId = parseInt(msg.match[2], 10)
     if loopState == 'on'
@@ -267,6 +283,7 @@ module.exports = (robot) ->
 
   # BRIDGE COMMANDS
   robot.respond /hue config/i, (msg) ->
+    hueApi = getClient()
     hueApi.then (api) ->
       api.configuration.getConfiguration()
     .then (config) ->
@@ -279,6 +296,7 @@ module.exports = (robot) ->
 
   # HELPERS
   groupMap = (groupName, callback) ->
+    hueApi = getClient()
     hueApi.then (api) ->
       api.groups.getAll()
     .then (groups) ->
