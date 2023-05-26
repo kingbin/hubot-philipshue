@@ -22,7 +22,7 @@
     "node-hue-api": "^4.0.11"
   },
   "peerDependencies": {
-    "hubot": "3.x"
+    "hubot": "^3 || ^4"
   },
   "devDependencies": {
     "chai": "^4.3.7",
