@@ -2,7 +2,7 @@
 
 This is a Hubot script package that will control your Philips Hue lights.
 
-[![Build Status](https://travis-ci.org/kingbin/hubot-philipshue.png)](https://travis-ci.org/kingbin/hubot-philipshue)
+[![npm version](https://badge.fury.io/js/hubot-philipshue.svg)](http://badge.fury.io/js/hubot-philipshue) [![Node CI](https://github.com/kingbin/hubot-philipshue/actions/workflows/nodejs.yml/badge.svg)](https://github.com/kingbin/hubot-philipshue/actions/workflows/nodejs.yml)
 
 ## Dependencies
 
