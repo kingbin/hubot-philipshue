@@ -19,7 +19,7 @@
     "url": "https://github.com/kingbin/hubot-philipshue/issues"
   },
   "dependencies": {
-    "node-hue-api": "^4.0.11"
+    "node-hue-api": "^5.0.0-beta.16"
   },
   "peerDependencies": {
     "hubot": ">=3 || 0.0.0-development"
