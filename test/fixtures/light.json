@@ -7,10 +7,7 @@
     "bri": 200,
     "sat": 200,
     "ct": 500,
-    "xy": [
-      0.5,
-      0.5
-    ],
+    "xy": [0.5, 0.5],
     "reachable": true,
     "colormode": "hs"
   },
